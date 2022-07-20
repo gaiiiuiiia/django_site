@@ -1,0 +1,57 @@
+version: "3.9"
+
+volumes:
+  postgres_data:
+  static:
+  media:
+
+services:
+  app:
+    container_name: ${CONTAINER_PREFIX}-app
+    build:
+      context: ../.
+      dockerfile: docker/app/Dockerfile
+      args:
+        - APP_DIR=${APP_DIR}
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - static:${APP_DIR}/static
+      - media:${APP_DIR}/media
+    depends_on:
+      - db
+    networks:
+      - app_network
+      - db_network
+    entrypoint: ${APP_DIR}/docker/app/entrypoint.sh
+
+  webserver:
+    container_name: ${CONTAINER_PREFIX}-webserver
+    build:
+      context: nginx
+      args:
+        - UPSTREAM_NAME=app
+        - UPSTREAM_CONTAINER=${CONTAINER_PREFIX}-app
+        - UPSTREAM_PORT=8000
+    ports:
+      - ${APPLICATION_PORT}:80
+    depends_on:
+      - app
+    networks:
+      - app_network
+
+  db:
+    container_name: ${CONTAINER_PREFIX}-db
+    image: postgres:14.4-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    networks:
+      - db_network
+
+networks:
+  app_network:
+  db_network:
