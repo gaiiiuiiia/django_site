@@ -6,27 +6,28 @@ RUN set -x ; \
     addgroup -g 82 -S www-data ; \
     adduser -u 82 -D -S -G www-data www-data && exit 0 ; exit 1
 
-ARG UPSTREAM_NAME=app
+ARG APPLICATION_ADDRESS=localhost
 # It must be a name of container which contains application
 ARG UPSTREAM_CONTAINER=django_app
-ARG UPSTREAM_PORT=8000
+ARG APP_DIR=/var/www/app/
+ARG APP_FOLDER=app
 RUN echo \
-"upstream ${UPSTREAM_NAME} { server ${UPSTREAM_CONTAINER}:${UPSTREAM_PORT}; }\n\
-server {\n\
-    listen 80;\n\
-    location / {\n\
-        proxy_pass http://${UPSTREAM_NAME};\n\
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n\
-        proxy_set_header Host \$host;\n\
-        proxy_redirect off;\n\
-    }\n\
-    location /static/ {\n\
-        alias /code/static/;\n\
-    }\n\
-    location /media/ {\n\
-        alias /code/media/;\n\
-    }\n\
-}" > /etc/nginx/conf.d/app.conf
-
+"upstream app { server ${UPSTREAM_CONTAINER}:8000; }"\
+"server {"\
+    "server_name ${APPLICATION_ADDRESS};"\
+    "listen 80;"\
+    "location / {"\
+        "proxy_pass http://app;"\
+        "proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;"\
+        "proxy_set_header Host \$host;"\
+        "proxy_redirect off;"\
+    "}"\
+    "location /static/ {"\
+        "alias ${APP_DIR}/${APP_FOLDER}/static/;"\
+    "}"\
+    "location /media/ {"\
+        "alias ${APP_DIR}/${APP_FOLDER}/media/;"\
+    "}"\
+"}" > /etc/nginx/conf.d/app.conf
 
 EXPOSE 80
