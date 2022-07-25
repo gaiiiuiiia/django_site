@@ -13,7 +13,7 @@ RUN apt-get update \
 COPY . .
 
 RUN python -m pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install -r requirements.txt
 
 ARG UID=1000
 ARG GID=1000
