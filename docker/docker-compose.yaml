@@ -1,9 +1,7 @@
 version: "3.9"
 
 volumes:
-  postgres_data:
-  static:
-  media:
+  db-data:
 
 services:
   app:
@@ -20,8 +18,8 @@ services:
       - ./.env
     volumes:
       - ../.:${APP_DIR}
-      - static:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
-      - media:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
+      - ../${APP_FOLDER}/${STATIC_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
+      - ../${APP_FOLDER}/${MEDIA_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
     depends_on:
       - db
     networks:
@@ -29,7 +27,7 @@ services:
       - db_network
     tty: true
     stdin_open: true
-    entrypoint: docker/app/entrypoint.sh
+    entrypoint: ./docker/app/entrypoint.sh
 
   webserver:
     container_name: ${CONTAINER_PREFIX}-webserver
@@ -44,8 +42,8 @@ services:
     env_file:
       - ./.env
     volumes:
-      - static:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
-      - media:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
+      - ../${APP_FOLDER}/${STATIC_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
+      - ../${APP_FOLDER}/${MEDIA_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
     ports:
       - ${APPLICATION_PORT}:80
     depends_on:
@@ -58,7 +56,7 @@ services:
     image: postgres:14.4-alpine
     restart: unless-stopped
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     env_file:
       - ./.env
     networks:
