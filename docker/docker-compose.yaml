@@ -13,6 +13,7 @@ services:
         - APP_DIR=${APP_DIR}
         - UID=${UID}
         - GID=${GID}
+        - INSTALL_GECKO_AND_FIREFOX=${INSTALL_GECKO_AND_FIREFOX}
     restart: unless-stopped
     env_file:
       - ./.env
