@@ -37,15 +37,16 @@ services:
     container_name: ${CONTAINER_PREFIX}-webserver
     build:
       context: ./nginx
-      args:
-        - APPLICATION_ADDRESS=${APPLICATION_ADDRESS}
-        - UPSTREAM_CONTAINER=${CONTAINER_PREFIX}-app
-        - APP_DIR=${APP_DIR}
-        - APP_FOLDER=${APP_FOLDER}
     restart: unless-stopped
     env_file:
       - ./.env
+    environment:
+      - UPSTREAM_CONTAINER=${CONTAINER_PREFIX}-app
+      - APPLICATION_ADDRESS=${APPLICATION_ADDRESS}
+      - APP_DIR=${APP_DIR}
+      - APP_FOLDER=${APP_FOLDER}
     volumes:
+      - ./nginx/:${APP_DIR}/${APP_FOLDER}/nginx
       - ../${APP_FOLDER}/${STATIC_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
       - ../${APP_FOLDER}/${MEDIA_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
     ports:
@@ -54,6 +55,11 @@ services:
       - app
     networks:
       - app_network
+    entrypoint: ${APP_DIR}/${APP_FOLDER}/nginx/entrypoint.sh
+    command:
+      - nginx
+      - -g
+      - daemon off;
 
   db:
     container_name: ${CONTAINER_PREFIX}-db
