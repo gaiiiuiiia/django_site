@@ -27,7 +27,8 @@ SECRET_KEY = 'django-insecure-91tgpm8tz1x%-v5)dj)_08%j_xrec)&vg#u9r9#t3d0ii9mlwq
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'dj-first.my',
+    os.environ.get('APPLICATION_ADDRESS'),
+    os.environ.get('CONTAINER_PREFIX') + '-webserver',
 ]
 
 
