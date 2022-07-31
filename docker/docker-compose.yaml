@@ -42,9 +42,6 @@ services:
       - ./.env
     environment:
       - UPSTREAM_CONTAINER=${CONTAINER_PREFIX}-app
-      - APPLICATION_ADDRESS=${APPLICATION_ADDRESS}
-      - APP_DIR=${APP_DIR}
-      - APP_FOLDER=${APP_FOLDER}
     volumes:
       - ./nginx/:${APP_DIR}/${APP_FOLDER}/nginx
       - ../${APP_FOLDER}/${STATIC_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
