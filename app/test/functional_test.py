@@ -40,14 +40,20 @@ class NewVisitorTest(unittest.TestCase):
 
         table = self._browser.find_element(By.ID, 'id_list_table')
         rows = table.find_elements(By.TAG_NAME, 'tr')
-        self.assertTrue(
-            any(row.text == '1: Купить павлинь перья' for row in rows)
-        )
+        self.assertIn('1: Купить павлиньи перья', [row.text for row in rows])
 
         # Текстовое поле по-прежнему приглашает ее добавить еще один элемент
         # Она вводит "Сделать мушку из павлиньих перьев (Эдит очень методична)"
+        input_box = self._browser.find_element(By.ID, 'id_new_item')
+        input_box.send_keys('Сделать мушку из павлиньих перьев')
+        input_box.send_keys(Keys.ENTER)
+        time.sleep(1)
 
         # Страница снова обновляется и теперь Эдит видит оба элемента ее списка
+        table = self._browser.find_element(By.ID, 'id_list_table')
+        rows = table.find_elements(By.TAG_NAME, 'tr')
+        self.assertIn('1: Купить павлиньи перья', [row.text for row in rows])
+        self.assertIn('2: Сделать мушку из павлиньих перьев', [row.text for row in rows])
 
         # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что сайт сгенерировал для нее уникальный URL-адрес -
         # об этом выводится небольшой текст с пояснениями
