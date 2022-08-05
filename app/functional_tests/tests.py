@@ -38,7 +38,7 @@ class NewVisitorTest(LiveServerTestCase):
         rows = table.find_elements(By.TAG_NAME, 'tr')
         self.assertIn(row_text, [row.text for row in rows])
 
-    def test_can_start_a_list_and_retrieve_it_later(self) -> None:
+    def test_can_start_a_list_for_one_user(self) -> None:
         # Эдит слышала про крутое web приложение, напоминающее список неотложных дел
         # Она заходит на главную страницу и видит, что заголовок сайта говорит ей о списках неотложных дел
         self._browser.get(self.live_server_url)
@@ -72,9 +72,45 @@ class NewVisitorTest(LiveServerTestCase):
         wait_for(self.check_row_in_list_table)('1: Купить павлиньи перья')
         wait_for(self.check_row_in_list_table)('2: Сделать мушку из павлиньих перьев')
 
-        # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что сайт сгенерировал для нее уникальный URL-адрес -
-        # об этом выводится небольшой текст с пояснениями
+    def test_multiple_users_can_start_list_at_different_urls(self) -> None:
+        # Эдит открывает сайт со списками
+        self._browser.get(self.live_server_url)
 
-        # Она посещает этот адрес, ее список по-прежнему там
-        # Удовлетворенная, она снова ложится спать
+        # И создает элемент списка
+        input_box = self._browser.find_element(By.ID, 'id_new_item')
+        input_box.send_keys('Элемент списка Эдит')
+        input_box.send_keys(Keys.ENTER)
+        wait_for(self.check_row_in_list_table)('1: Элемент списка Эдит')
+
+        # Она замечает, что ее список имеет уникальный URL-адрес
+        edith_list_url = self._browser.current_url
+        self.assertRegex(edith_list_url, '/lists/.+')
+
+        # Теперь новый пользователь Френсис заходит на сайт
+
+        ## Переоткроем браузер. Тем самым мы исключаем вероятность того, что данные Эдит попадут Френсису
+        self._browser.quit()
+        self._browser = webdriver.Firefox()
+
+        # Френсис посещает домашнюю страницу. Нет никаких признаков списка Эдит
+        self._browser.get(self.live_server_url)
+        page_text = self._browser.find_element(By.TAG_NAME, 'body').text
+        self.assertNotIn('Элемент списка Эдит', page_text)
+
+        # Френсис начинает новый список
+        input_box = self._browser.find_element(By.ID, 'id_new_item')
+        input_box.send_keys('Элемент списка Френсиса')
+        input_box.send_keys(Keys.ENTER)
+        wait_for(self.check_row_in_list_table)('1: Элемент списка Френсиса')
+
+        # Френсис получает уникальный URL-адрес
+        francis_list_url = self._browser.current_url
+        self.assertRegex(francis_list_url, '/lists/.+')
+        self.assertNotEqual(francis_list_url, edith_list_url)
+
+        # Нет и следа от списка Эдит
+        page_text = self._browser.find_element(By.TAG_NAME, 'body').text
+        self.assertIn('Элемент списка Френсиса', page_text)
+        self.assertNotIn('Элемент списка Эдит', page_text)
+
         self.fail('End test')
