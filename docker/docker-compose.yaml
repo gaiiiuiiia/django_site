@@ -59,6 +59,8 @@ services:
       - db-data:/var/lib/postgresql/data
     env_file:
       - ./.env
+    ports:
+      - ${POSTGRES_DB_PORT}:5432
     networks:
       - db_network
 
