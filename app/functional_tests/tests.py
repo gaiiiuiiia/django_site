@@ -1,9 +1,28 @@
 import time
+from typing import Callable
 
 from django.test import LiveServerTestCase
 from selenium import webdriver
+from selenium.common import WebDriverException
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
+
+
+def wait_for(
+        callback: callable,
+        limit: float = 5,
+        tick: float = 0.3,
+) -> Callable:
+    def inner_wrapper(*args, **kwargs) -> None:
+        start_time = time.time()
+        while True:
+            try:
+                return callback(*args, **kwargs)
+            except (AssertionError, WebDriverException) as e:
+                if time.time() - start_time > limit:
+                    raise e
+                time.sleep(tick)
+    return inner_wrapper
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -41,20 +60,17 @@ class NewVisitorTest(LiveServerTestCase):
         # Когда она нажимает enter, страница обновляется, и теперь страница содержит
         # "1: Купить павлиньи перья" в качестве элемента списка
         input_box.send_keys(Keys.ENTER)
-        time.sleep(1)
-
-        self.check_row_in_list_table('1: Купить павлиньи перья')
+        wait_for(self.check_row_in_list_table)('1: Купить павлиньи перья')
 
         # Текстовое поле по-прежнему приглашает ее добавить еще один элемент
         # Она вводит "Сделать мушку из павлиньих перьев (Эдит очень методична)"
         input_box = self._browser.find_element(By.ID, 'id_new_item')
         input_box.send_keys('Сделать мушку из павлиньих перьев')
         input_box.send_keys(Keys.ENTER)
-        time.sleep(1)
 
         # Страница снова обновляется и теперь Эдит видит оба элемента ее списка
-        self.check_row_in_list_table('1: Купить павлиньи перья')
-        self.check_row_in_list_table('2: Сделать мушку из павлиньих перьев')
+        wait_for(self.check_row_in_list_table)('1: Купить павлиньи перья')
+        wait_for(self.check_row_in_list_table)('2: Сделать мушку из павлиньих перьев')
 
         # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что сайт сгенерировал для нее уникальный URL-адрес -
         # об этом выводится небольшой текст с пояснениями
