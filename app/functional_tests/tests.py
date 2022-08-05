@@ -1,15 +1,12 @@
-import os
 import time
-import unittest
 
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 
-DOCKER_WEBSERVER_URL = f"http://{os.environ.get('CONTAINER_PREFIX', '')}-webserver"
 
-
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self) -> None:
         self._browser = webdriver.Firefox()
@@ -25,7 +22,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrieve_it_later(self) -> None:
         # Эдит слышала про крутое web приложение, напоминающее список неотложных дел
         # Она заходит на главную страницу и видит, что заголовок сайта говорит ей о списках неотложных дел
-        self._browser.get(DOCKER_WEBSERVER_URL)
+        self._browser.get(self.live_server_url)
         self.assertIn('To-Do List', self._browser.title)
 
         header_text = self._browser.find_element(By.TAG_NAME, 'h1').text
@@ -65,7 +62,3 @@ class NewVisitorTest(unittest.TestCase):
         # Она посещает этот адрес, ее список по-прежнему там
         # Удовлетворенная, она снова ложится спать
         self.fail('End test')
-
-
-if __name__ == '__main__':
-    unittest.main()
