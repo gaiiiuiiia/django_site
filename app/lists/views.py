@@ -12,4 +12,8 @@ def home_page(request: HttpRequest) -> HttpResponse:
         Item.objects.create(text=new_item_text)
         return redirect('home')
 
-    return render(request, 'lists/home.html')
+    context = {
+        'items': Item.objects.all(),
+    }
+
+    return render(request, 'lists/home.html', context)

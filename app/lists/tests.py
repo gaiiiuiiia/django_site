@@ -24,6 +24,15 @@ class HomePageTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], '/')
 
+    def test_display_many_list_items(self) -> None:
+        Item.objects.create(text='first item')
+        Item.objects.create(text='second item')
+
+        response = self.client.get('/')
+
+        self.assertIn('first item', response.content.decode())
+        self.assertIn('second item', response.content.decode())
+
 
 class ItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self) -> None:
