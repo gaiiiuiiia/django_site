@@ -22,16 +22,7 @@ class HomePageTest(TestCase):
         response = self.client.post('/', data={'item_text': 'A new list item'})
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
-
-    def test_display_many_list_items(self) -> None:
-        Item.objects.create(text='first item')
-        Item.objects.create(text='second item')
-
-        response = self.client.get('/')
-
-        self.assertIn('first item', response.content.decode())
-        self.assertIn('second item', response.content.decode())
+        self.assertEqual(response['location'], '/lists/unique_list/')
 
 
 class ItemModelTest(TestCase):
@@ -49,3 +40,17 @@ class ItemModelTest(TestCase):
 
         self.assertEqual(saved_items[0].text, 'First item')
         self.assertEqual(saved_items[1].text, 'Second item')
+
+class ListViewTest(TestCase):
+    def test_uses_list_template(self) -> None:
+        response = self.client.get('/lists/unique_list/')
+        self.assertTemplateUsed(response, 'lists/list.html')
+
+    def test_display_all_items(self) -> None:
+        Item.objects.create(text='first item')
+        Item.objects.create(text='second item')
+
+        response = self.client.get('/lists/unique_list/')
+
+        self.assertContains(response, 'first item')
+        self.assertContains(response, 'second item')
