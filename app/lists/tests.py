@@ -1,7 +1,7 @@
-from django.http import HttpResponse
 from django.test import TestCase
 
 from lists.models import Item
+from lists.models import List
 
 
 class HomePageTest(TestCase):
@@ -12,21 +12,22 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, 'lists/home.html')
 
 
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
     def test_saving_and_retrieving_items(self) -> None:
-        first_item = Item()
-        first_item.text = 'First item'
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Second item'
-        second_item.save()
+        list_ = List.objects.create()
+        first_item = Item.objects.create(text='First item', list=list_)
+        second_item = Item.objects.create(text='Second item', list=list_)
 
         saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(), 2)
 
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list, list_)
+
         self.assertEqual(saved_items[0].text, 'First item')
         self.assertEqual(saved_items[1].text, 'Second item')
+        self.assertEqual(saved_items[0].list, list_)
+        self.assertEqual(saved_items[1].list, list_)
 
 class ListViewTest(TestCase):
     def test_uses_list_template(self) -> None:
@@ -34,8 +35,9 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, 'lists/list.html')
 
     def test_display_all_items(self) -> None:
-        Item.objects.create(text='first item')
-        Item.objects.create(text='second item')
+        list_ = List.objects.create()
+        Item.objects.create(text='first item', list=list_)
+        Item.objects.create(text='second item', list=list_)
 
         response = self.client.get('/lists/unique_list/')
 

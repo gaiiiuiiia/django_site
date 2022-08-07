@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpRequest
 
-from lists.models import Item
+from lists.models import Item, List
 
 
 def home_page(request: HttpRequest) -> HttpResponse:
@@ -19,6 +19,8 @@ def view_list(request: HttpRequest) -> HttpResponse:
 
 
 def new_list(request: HttpRequest) -> HttpResponse:
-    new_item_text = request.POST.get('item_text')
-    Item.objects.create(text=new_item_text)
+    list_ = List.objects.create()
+    text = request.POST.get('item_text')
+    Item.objects.create(text=text, list = list_)
+
     return redirect('lists.view_list')
