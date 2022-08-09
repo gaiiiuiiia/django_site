@@ -22,7 +22,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
 def new_list(request: HttpRequest) -> HttpResponse:
     list_ = List.objects.create()
     text = request.POST.get('item_text')
-    Item.objects.create(text=text, list = list_)
+    Item.objects.create(text=text, list=list_)
 
     return redirect('lists.view', list_id=list_.id)
 
