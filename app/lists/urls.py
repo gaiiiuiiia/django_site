@@ -3,6 +3,7 @@ import lists.views as views
 
 
 urlpatterns = [
-    path('unique_list/', views.view_list, name='lists.view_list'),
-    path('new', views.new_list, name='lists.new_list'),
+    path('<int:list_id>/', views.view_list, name='lists.view'),
+    path('<int:list_id>/add', views.add_list, name='lists.add'),
+    path('new', views.new_list, name='lists.new'),
 ]
