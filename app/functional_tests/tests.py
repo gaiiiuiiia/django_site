@@ -1,7 +1,7 @@
 import time
 from typing import Callable
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.common import WebDriverException
 from selenium.webdriver import Keys
@@ -25,7 +25,7 @@ def wait_for(
     return inner_wrapper
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self) -> None:
         self._browser = webdriver.Firefox()
@@ -133,7 +133,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Она начинает новый список и видит, что там поле для ввода также центрировано
         input_box.send_keys('New list')
         input_box.send_keys(Keys.ENTER)
-        wait_for(self.check_row_in_list_table('New list'))
+        wait_for(self.check_row_in_list_table)('1: New list')
 
         input_box = self._browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
