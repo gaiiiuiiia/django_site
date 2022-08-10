@@ -1,7 +1,7 @@
 from .base import FunctionalTest
 
 
-class ItemValidationTest(FunctionalTest):
+class TestItemValidation(FunctionalTest):
     def test_cannot_add_empty_list_items(self) -> None:
         # Эдит открывает домашнюю страницу и случайно пытается отправить пустой элемент списка
 

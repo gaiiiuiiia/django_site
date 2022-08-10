@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from .base import FunctionalTest
 
 
-class LayoutAndStyingTest(FunctionalTest):
+class TestLayoutAndStying(FunctionalTest):
     def test_layout_and_styling(self) -> None:
         # Эдит заходит на домашнюю страницу и видит, что поле для ввода центрировано
         self._browser.get(self.live_server_url)

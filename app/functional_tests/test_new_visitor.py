@@ -5,7 +5,7 @@ from selenium import webdriver
 from .base import FunctionalTest
 
 
-class NewVisitorTest(FunctionalTest):
+class TestNewVisitor(FunctionalTest):
     def test_can_start_a_list_for_one_user(self) -> None:
         # Эдит слышала про крутое web приложение, напоминающее список неотложных дел
         # Она заходит на главную страницу и видит, что заголовок сайта говорит ей о списках неотложных дел
