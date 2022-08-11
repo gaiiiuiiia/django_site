@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 
 from lists.models import Item
 from lists.models import List
@@ -70,6 +71,28 @@ class NewListTest(TestCase):
             response,
             reverse('lists.view', kwargs={'list_id': new_list.id})
         )
+
+    def test_validation_errors_are_sent_back_to_home_page_template(self) -> None:
+        response = self.client.post(
+            reverse('lists.new'),
+            data={'item_text': ''}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'lists/home.html')
+
+        # escape - экранизация символов
+        expected_error = escape("You can`t have empty list item")
+        self.assertContains(response, expected_error)
+
+    def test_invalid_items_arent_saved(self) -> None:
+        self.client.post(
+            reverse('lists.new'),
+            data={'item_text': ''}
+        )
+
+        self.assertEqual(List.objects.count(), 0)
+        self.assertEqual(Item.objects.count(), 0)
 
 
 class NewItemTest(TestCase):
