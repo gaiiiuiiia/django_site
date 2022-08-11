@@ -10,8 +10,8 @@ class FunctionalTest(StaticLiveServerTestCase):
     @staticmethod
     def wait_for(
             callback: callable,
-            limit: float = 5,
-            tick: float = 0.3,
+            limit_time: float = 5,
+            tick_time: float = 0.3,
     ) -> Callable:
         def inner_wrapper(*args, **kwargs) -> None:
             start_time = time.time()
@@ -19,9 +19,9 @@ class FunctionalTest(StaticLiveServerTestCase):
                 try:
                     return callback(*args, **kwargs)
                 except (AssertionError, WebDriverException) as e:
-                    if time.time() - start_time > limit:
+                    if time.time() - start_time > limit_time:
                         raise e
-                    time.sleep(tick)
+                    time.sleep(tick_time)
 
         return inner_wrapper
 
