@@ -22,7 +22,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
         try:
             item.full_clean()
             item.save()
-            return redirect('lists.view', list_id=list_.id)
+            return redirect(list_)
         except ValidationError:
             item.delete()
             error = 'You can`t have empty list item'
@@ -47,4 +47,4 @@ def new_list(request: HttpRequest) -> HttpResponse:
 
     item.save()
 
-    return redirect('lists.view', list_id=list_.id)
+    return redirect(list_)

@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 from lists.models import Item
 from lists.models import List
@@ -29,3 +30,7 @@ class ListAndItemModelTest(TestCase):
         with self.assertRaises(ValidationError):
             item.full_clean()
             item.save()
+
+    def test_get_absolute_url(self) -> None:
+        list_ = List.objects.create()
+        self.assertEqual(list_.get_absolute_url(), reverse('lists.view', kwargs={'list_id': list_.id}))
