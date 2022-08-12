@@ -3,7 +3,7 @@
 {% block header_text %}Your To-Do List{% endblock %}
 
 {% block form_action %}
-    {% url 'lists.add' list.id %}
+    {% url 'lists.view' list.id %}
 {% endblock %}
 
 {% block table %}
