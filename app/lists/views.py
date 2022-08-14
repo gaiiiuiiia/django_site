@@ -20,7 +20,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     error = None
     if request.method == 'POST':
         item = Item.objects.create(
-            text=request.POST.get('item_text', ''),
+            text=request.POST.get('text', ''),
             list=list_
         )
         try:
@@ -39,7 +39,7 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
 
 def new_list(request: HttpRequest) -> HttpResponse:
     list_ = List.objects.create()
-    text = request.POST.get('item_text')
+    text = request.POST.get('text')
     item = Item.objects.create(text=text, list=list_)
     try:
         item.full_clean()

@@ -8,7 +8,6 @@ class ItemFormTest(TestCase):
 
         self.assertIn('placeholder="Enter a to-do item"', form.as_p())
         self.assertIn('class="form-control"', form.as_p())
-        self.fail(form.as_p())
 
     def test_form_validation_for_blank_items(self) -> None:
         form = ItemForm(data={'text': ''})

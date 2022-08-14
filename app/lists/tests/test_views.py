@@ -58,7 +58,7 @@ class ListViewTest(TestCase):
 
         self.client.post(
             reverse('lists.view', kwargs={'list_id': correct_list.id}),
-            data={'item_text': 'A new item for existing list'}
+            data={'text': 'A new item for existing list'}
         )
         self.assertEqual(Item.objects.count(), 1)
 
@@ -73,7 +73,7 @@ class ListViewTest(TestCase):
 
         response = self.client.post(
             reverse('lists.view', kwargs={'list_id': correct_list.id}),
-            data={'item_text': 'A new item for existing list'}
+            data={'text': 'A new item for existing list'}
         )
 
         self.assertRedirects(
@@ -86,7 +86,7 @@ class NewListTest(TestCase):
     def test_can_save_a_POST_request(self) -> None:
         self.client.post(
             reverse('lists.new'),
-            data={'item_text': 'A new list item'}
+            data={'text': 'A new list item'}
         )
 
         self.assertEqual(Item.objects.count(), 1)
@@ -96,7 +96,7 @@ class NewListTest(TestCase):
     def test_redirects_after_POST(self) -> None:
         response = self.client.post(
             reverse('lists.new'),
-            data={'item_text': 'A new list item'}
+            data={'text': 'A new list item'}
         )
         new_list = List.objects.first()
 
@@ -108,7 +108,7 @@ class NewListTest(TestCase):
     def test_validation_errors_are_sent_back_to_home_page_template(self) -> None:
         response = self.client.post(
             reverse('lists.new'),
-            data={'item_text': ''}
+            data={'text': ''}
         )
 
         self.assertEqual(response.status_code, 200)
@@ -121,7 +121,7 @@ class NewListTest(TestCase):
     def test_invalid_items_arent_saved(self) -> None:
         self.client.post(
             reverse('lists.new'),
-            data={'item_text': ''}
+            data={'text': ''}
         )
 
         self.assertEqual(List.objects.count(), 0)

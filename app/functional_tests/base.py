@@ -4,6 +4,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.by import By
 from selenium.common import WebDriverException
 from selenium import webdriver
+from selenium.webdriver.remote.webelement import WebElement
 
 
 class FunctionalTest(StaticLiveServerTestCase):
@@ -29,6 +30,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         table = self._browser.find_element(By.ID, 'id_list_table')
         rows = table.find_elements(By.TAG_NAME, 'tr')
         self.assertIn(row_text, [row.text for row in rows])
+
+    def get_item_input_box(self) -> WebElement:
+        return self._browser.find_element(By.ID, 'id_text')
 
     def setUp(self) -> None:
         self._browser = webdriver.Firefox()

@@ -13,7 +13,7 @@ class TestLayoutAndStying(FunctionalTest):
 
         self._browser.set_window_size(BROWSER_WIDTH, BROWSER_HEIGHT)
 
-        input_box = self._browser.find_element(By.ID, 'id_new_item')
+        input_box = self.get_item_input_box()
         self.assertAlmostEqual(
             input_box.location['x'] + input_box.size['width'] / 2,
             BROWSER_WIDTH / 2,
@@ -25,7 +25,7 @@ class TestLayoutAndStying(FunctionalTest):
         input_box.send_keys(Keys.ENTER)
         self.wait_for(self.check_row_in_list_table)('1: New list')
 
-        input_box = self._browser.find_element(By.ID, 'id_new_item')
+        input_box = self.get_item_input_box()
         self.assertAlmostEqual(
             input_box.location['x'] + input_box.size['width'] / 2,
             BROWSER_WIDTH / 2,
