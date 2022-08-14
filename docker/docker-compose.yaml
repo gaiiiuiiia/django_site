@@ -46,6 +46,7 @@ services:
       - ./nginx/:${APP_DIR}/${APP_FOLDER}/nginx
       - ../${APP_FOLDER}/${STATIC_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${STATIC_FILES_FOLDER}
       - ../${APP_FOLDER}/${MEDIA_FILES_FOLDER}:${APP_DIR}/${APP_FOLDER}/${MEDIA_FILES_FOLDER}
+      - ./nginx/logs:/var/log/nginx/
     ports:
       - ${APPLICATION_PORT}:80
     depends_on:

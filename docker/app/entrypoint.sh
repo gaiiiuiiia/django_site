@@ -37,12 +37,16 @@ cd $APP_DIR/$APP_FOLDER
 
 sleep 10
 
-if [ $IS_NEW_PROJECT -eq 0 ]; then \
-  python manage.py migrate
-  python manage.py createcachetable
-  python manage.py collectstatic --noinput
+python manage.py migrate
+python manage.py createcachetable
+python manage.py collectstatic --noinput
+
+if ! [ $DEBUG -eq 1 ]; then
+  echo "STARTING GUNICORN..."
+  gunicorn $APP_FOLDER.wsgi --bind 0.0.0.0:8000
 fi
 
-gunicorn $APP_FOLDER.wsgi --bind 0.0.0.0:8000
+echo "RUNNING IN DEBUG MODE! SERVER ISN'T START. TRY TO SETUP A DEBUG IN YOUR IDE AND RUN IN THROUGH IDE."
+echo "FOR MORE INFORMATION SEE https://testdriven.io/blog/django-debugging-pycharm/"
 
 exec "$@"
