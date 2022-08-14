@@ -4,11 +4,15 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpRequest
 
+from lists.forms import ItemForm
 from lists.models import Item, List
 
 
 def home_page(request: HttpRequest) -> HttpResponse:
-    return render(request, 'lists/home.html')
+    form = ItemForm()
+    return render(request, 'lists/home.html', {
+        'form': form,
+    })
 
 
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
