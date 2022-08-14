@@ -14,41 +14,28 @@ def home_page(request: HttpRequest) -> HttpResponse:
         'form': form,
     })
 
-
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     list_ = List.objects.get(id=list_id)
-    error = None
+    form = ItemForm()
     if request.method == 'POST':
-        item = Item.objects.create(
-            text=request.POST.get('text', ''),
-            list=list_
-        )
-        try:
-            item.full_clean()
-            item.save()
+        form = ItemForm(request.POST)
+        if form.is_valid():
+            Item.objects.create(text=form.cleaned_data.get('text'), list=list_)
             return redirect(list_)
-        except ValidationError:
-            item.delete()
-            error = 'You can`t have empty list item'
 
     return render(request, 'lists/list.html', {
         'list': list_,
-        'error': error,
+        'form': form,
     })
 
 
 def new_list(request: HttpRequest) -> HttpResponse:
-    list_ = List.objects.create()
-    text = request.POST.get('text')
-    item = Item.objects.create(text=text, list=list_)
-    try:
-        item.full_clean()
-    except ValidationError:
-        list_.delete()
-        item.delete()
-        error = "You can`t have empty list item"
-        return render(request, 'lists/home.html', {'error': error})
+    form = ItemForm(data=request.POST)
+    if form.is_valid():
+        list_ = List.objects.create()
+        Item.objects.create(text=form.cleaned_data.get('text'), list=list_)
+        return redirect(list_)
 
-    item.save()
-
-    return redirect(list_)
+    return render(request, 'lists/home.html', {
+        'form': form,
+    })
