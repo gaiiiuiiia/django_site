@@ -41,12 +41,12 @@ python manage.py migrate
 python manage.py createcachetable
 python manage.py collectstatic --noinput
 
-if ! [ $DEBUG -eq 1 ]; then
+if [ $DEBUG -eq 1 ]; then
+  echo "RUNNING IN DEBUG MODE! SERVER ISN'T START. TRY TO SETUP A DEBUG IN YOUR IDE AND RUN IN THROUGH IDE."
+  echo "FOR MORE INFORMATION SEE https://testdriven.io/blog/django-debugging-pycharm/"
+else
   echo "STARTING GUNICORN..."
   gunicorn $APP_FOLDER.wsgi --bind 0.0.0.0:8000
 fi
-
-echo "RUNNING IN DEBUG MODE! SERVER ISN'T START. TRY TO SETUP A DEBUG IN YOUR IDE AND RUN IN THROUGH IDE."
-echo "FOR MORE INFORMATION SEE https://testdriven.io/blog/django-debugging-pycharm/"
 
 exec "$@"
