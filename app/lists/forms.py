@@ -1,10 +1,22 @@
 from django import forms
+from lists.models import Item
+
+EMPTY_ITEM_ERROR = 'You can`t have empty list item'
 
 
-class ItemForm(forms.Form):
-    item_text = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Enter a to-do item',
-            'class': 'form-control',
-        })
-    )
+class ItemForm(forms.ModelForm):
+
+    class Meta:
+        model = Item
+        fields = ('text', )
+        widgets = {
+            'text': forms.TextInput(attrs={
+                'placeholder': 'Enter a to-do item',
+                'class': 'form-control',
+            })
+        }
+        error_messages = {
+            'text': {
+                'required': EMPTY_ITEM_ERROR,
+            },
+        }
