@@ -1,3 +1,6 @@
 .idea
 .gitignore
 .dockerignore
+venv
+env
+requirements_local.txt

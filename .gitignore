@@ -2,6 +2,8 @@ docker/.env
 app/static
 .idea
 logs
+venv
+env
 
 *.sqlite3
 
