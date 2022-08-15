@@ -15,3 +15,8 @@
 STATIC_ROOT = os.path.join(BASE_DIR, 'static').
 После этого надо остановить контейнеры docker-compose down, раскомментировать вольюмы и поднять их еще раз. После второго 
 поднятия контейнеров будут выполнен сбор статических файлов и миграции.
+
+
+При желании использовать flake8 - код линтера, можно поставить локально виртуальное окружение и 
+выполнить pip install -r requirements_local.txt --no-cache.
+Советы по настройке flake8 см. на https://melevir.medium.com/pycharm-loves-flake-671c7fac4f52
