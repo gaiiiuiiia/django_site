@@ -6,22 +6,19 @@ from lists.models import Item
 from lists.models import List
 
 
-class ListAndItemModelTest(TestCase):
-    def test_saving_and_retrieving_items(self) -> None:
+class ListModelTest(TestCase):
+    def test_get_absolute_url(self) -> None:
         list_ = List.objects.create()
-        first_item = Item.objects.create(text='First item', list=list_)
-        second_item = Item.objects.create(text='Second item', list=list_)
+        self.assertEqual(
+            list_.get_absolute_url(),
+            reverse('lists.view', kwargs={'list_id': list_.id})
+        )
 
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
 
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        self.assertEqual(saved_items[0].text, 'First item')
-        self.assertEqual(saved_items[1].text, 'Second item')
-        self.assertEqual(saved_items[0].list, list_)
-        self.assertEqual(saved_items[1].list, list_)
+class ItemModelTest(TestCase):
+    def test_item_default_text(self) -> None:
+        item = Item()
+        self.assertEqual(item.text, '')
 
     def test_cant_save_item_with_empty_text(self) -> None:
         list_ = List.objects.create()
@@ -31,6 +28,25 @@ class ListAndItemModelTest(TestCase):
             item.full_clean()
             item.save()
 
-    def test_get_absolute_url(self) -> None:
+    def test_item_is_related_to_list(self) -> None:
         list_ = List.objects.create()
-        self.assertEqual(list_.get_absolute_url(), reverse('lists.view', kwargs={'list_id': list_.id}))
+        item = Item()
+        item.list = list_
+        item.save()
+        self.assertEqual(item.list, list_)
+
+    def test_cant_save_duplicate_items(self) -> None:
+        similar_text = 'There is similar text'
+        list_ = List.objects.create()
+        Item.objects.create(text=similar_text, list=list_)
+        with self.assertRaises(ValidationError):
+            item = Item(text=similar_text, list=list_)
+            item.full_clean()
+
+    def test_can_save_similar_items_on_different_lists(self) -> None:
+        similar_text = 'Another similar text'
+        Item.objects.create(text=similar_text, list=List.objects.create())
+        item = Item.objects.create(text=similar_text, list=List.objects.create())
+
+        # Ошибки быть не должно
+        item.full_clean()

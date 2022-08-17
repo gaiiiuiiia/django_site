@@ -6,6 +6,11 @@ class Item(models.Model):
     text = models.TextField(default='')
     list = models.ForeignKey('List', default=None, on_delete=models.CASCADE)
 
+    class Meta:
+        ordering = ('id',)
+        unique_together = ('list', 'text')
+
+
 class List(models.Model):
     def get_absolute_url(self) -> str:
         return reverse('lists.view', kwargs={'list_id': self.id})
