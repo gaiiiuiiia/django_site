@@ -1,5 +1,5 @@
 from django import forms
-from lists.models import Item
+from lists.models import Item, List
 
 EMPTY_ITEM_ERROR = 'You can`t have empty list item'
 
@@ -20,3 +20,7 @@ class ItemForm(forms.ModelForm):
                 'required': EMPTY_ITEM_ERROR,
             },
         }
+
+    def save_for_list(self, list_: List) -> None:
+        self.instance.list = list_
+        return super().save()

@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -14,13 +13,14 @@ def home_page(request: HttpRequest) -> HttpResponse:
         'form': form,
     })
 
+
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     list_ = List.objects.get(id=list_id)
     form = ItemForm()
     if request.method == 'POST':
         form = ItemForm(request.POST)
         if form.is_valid():
-            Item.objects.create(text=form.cleaned_data.get('text'), list=list_)
+            form.save_for_list(list_)
             return redirect(list_)
 
     return render(request, 'lists/list.html', {
