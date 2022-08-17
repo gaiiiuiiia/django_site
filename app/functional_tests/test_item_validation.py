@@ -49,4 +49,4 @@ class TestItemValidation(FunctionalTest):
         self.wait_for(lambda: self.assertEqual(
             self._browser.find_element(By.CSS_SELECTOR, '.has-error').text,
             DUPLICATE_ITEM_ERROR
-        ))
+        ))()

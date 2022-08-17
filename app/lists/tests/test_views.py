@@ -1,8 +1,10 @@
+from unittest import skip
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
 from lists.models import Item
 from lists.models import List
 
@@ -112,6 +114,25 @@ class ListViewTest(TestCase):
     def test_invalid_input_show_error_on_page(self) -> None:
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
+
+    # is_valid формы должен заранее знать, что есть дубликат. сейчас же выпадает ошибка целостности бд
+    # форма должна знать, для какого списка выполняется создание элемента
+    # пока скип
+    @skip
+    def test_duplication_error_end_up_on_lists_page(self) -> None:
+        similar_text = 'similar text'
+        error_text = escape(DUPLICATE_ITEM_ERROR)
+
+        list_ = List.objects.create()
+        Item.objects.create(text=similar_text, list=list_)
+        response = self.client.post(
+            reverse('lists.view', kwargs={'list_id': list_.id}),
+            data={'text': similar_text}
+        )
+
+        self.assertContains(response, error_text)
+        self.assertTemplateUsed(response, 'lists/list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
 
 
 class NewListTest(TestCase):
