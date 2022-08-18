@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Test Suite</title>
+<link rel="stylesheet" href="qunit-2.19.1.css">
+<body>
+<div id="qunit"></div>
+<script src="qunit-2.19.1.js"></script>
+<script src="../jquery-3.6.0.js"></script>
+<script src="../lists/list.js"></script>
+
+<div class="qunit-fixture">
+    <form action="#">
+        <input type="text" name="text">
+        <div class="has-error"></div>
+    </form>
+</div>
+
+<script>
+    QUnit.module('test', function () {
+        QUnit.test('errors should be hidden on keypress', function (assert) {
+            initialize();
+            $('input[name="text"]').trigger('keypress');
+            assert.equal($('.has-error').is(':visible'), false);
+        });
+    });
+</script>
+</body>
