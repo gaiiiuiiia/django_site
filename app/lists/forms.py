@@ -30,7 +30,7 @@ class ItemForm(forms.ModelForm):
 
 
 class ExistingListItemForm(ItemForm):
-    def __init__(self, list_: List, *args, **kwargs):
+    def __init__(self, list_: List, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.instance.list = list_
 

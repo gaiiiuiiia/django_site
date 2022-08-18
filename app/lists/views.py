@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpRequest
 
-from lists.forms import ItemForm
+from lists.forms import ItemForm, ExistingListItemForm
 from lists.models import Item, List
 
 
@@ -16,9 +16,9 @@ def home_page(request: HttpRequest) -> HttpResponse:
 
 def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
     list_ = List.objects.get(id=list_id)
-    form = ItemForm()
+    form = ExistingListItemForm(list_)
     if request.method == 'POST':
-        form = ItemForm(request.POST)
+        form = ExistingListItemForm(list_, request.POST)
         if form.is_valid():
             form.save_for_list(list_)
             return redirect(list_)
