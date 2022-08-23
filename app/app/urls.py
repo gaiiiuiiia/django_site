@@ -17,8 +17,10 @@ from django.urls import path
 from django.urls import include
 import lists.views as lists_views
 import lists.urls as lists_urls
+import accounts.urls as accounts_urls
 
 urlpatterns = [
     path('', lists_views.home_page, name='home'),
     path('lists/', include(lists_urls)),
+    path('accounts/', include(accounts_urls)),
 ]

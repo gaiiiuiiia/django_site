@@ -10,13 +10,6 @@ TEST_EMAIL = 'steewejoe@gmail.com'
 
 
 class TestLogin(FunctionalTest):
-    def check_title_of_new_opened_tab(self, title_text: str) -> bool:
-        next_tab = self._browser.window_handles[1]
-        self._browser.switch_to.window(next_tab)
-        title = self._browser.title
-        prev_tab = self._browser.window_handles[0]
-        self._browser.switch_to.window(prev_tab)
-        return title == title_text
 
     def test_can_get_email_link_to_log_in(self) -> None:
         # Айгуль заходит на сайт с заметками и видит поле для ввода email
@@ -26,9 +19,10 @@ class TestLogin(FunctionalTest):
         self._browser.find_element(By.NAME, 'email').send_keys(Keys.ENTER)
 
         # Она видит сообщение, которое оповещает ее, что письмо успешно отправлено
-        self.wait_for(lambda: self.assertTrue(
-            self.check_title_of_new_opened_tab('Mail successfully send')
-        ))()
+        self.wait_for(lambda: self.assertIn(
+            'Mail successfully send',
+            self._browser.find_element(By.TAG_NAME, 'body').text)
+        )()
 
         email = mail.outbox[0]
         self.assertIn(TEST_EMAIL, email.to)
@@ -43,6 +37,13 @@ class TestLogin(FunctionalTest):
         self._browser.get(url)
 
         # После перехода по ссылке она попадает на страницу сайта. Она в системе!
-        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'Log out'))
+        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'Log out'))()
         navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
         self.assertIn(TEST_EMAIL, navbar.text)
+
+        # Айгуль хочет выйти из своей учетной записи и нажимает на кнопку выйти
+        self._browser.find_element(By.LINK_TEXT, 'Log out').click()
+
+        self.wait_for(lambda: self._browser.find_element(By.NAME, 'email'))()
+        navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
+        self.assertNotIn(TEST_EMAIL, navbar.text)

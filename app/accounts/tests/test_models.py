@@ -1,3 +1,4 @@
+from django.contrib import auth
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -14,6 +15,13 @@ class TestUserModel(TestCase):
     def test_email_is_primary_key(self) -> None:
         user = User(email='a@b.com')
         self.assertEqual(user.pk, 'a@b.com')
+
+    def test_no_problem_with_auth_login(self) -> None:
+        user = User.objects.create(email='steewejoe@gmail.com')
+        user.backend = ''
+        request = self.client.request().wsgi_request
+        # не должно поднять исключение
+        auth.login(request, user)
 
 
 class TestTokenModel(TestCase):
