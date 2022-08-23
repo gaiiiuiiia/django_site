@@ -26,6 +26,16 @@ class FunctionalTest(StaticLiveServerTestCase):
 
         return inner_wrapper
 
+    def wait_to_be_logged_in(self, email: str) -> None:
+        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'Log out'))()
+        navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
+        self.assertIn(email, navbar.text)
+
+    def wait_to_be_logged_out(self, email: str) -> None:
+        self.wait_for(lambda: self._browser.find_element(By.NAME, 'email'))()
+        navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
+        self.assertNotIn(email, navbar.text)
+
     def check_row_in_list_table(self, row_text: str) -> None:
         table = self._browser.find_element(By.ID, 'id_list_table')
         rows = table.find_elements(By.TAG_NAME, 'tr')
