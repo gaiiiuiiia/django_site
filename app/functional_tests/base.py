@@ -7,14 +7,12 @@ from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 
 
-class FunctionalTest(StaticLiveServerTestCase):
-    @staticmethod
-    def wait_for(
-            callback: callable,
-            limit_time: float = 5,
-            tick_time: float = 0.3,
-    ) -> Callable:
-        def inner_wrapper(*args, **kwargs) -> None:
+def wait(
+        limit_time: float = 5,
+        tick_time: float = 0.3
+) -> Callable:
+    def decorator(callback: callable) -> Callable:
+        def wrapper(*args, **kwargs):
             start_time = time.time()
             while True:
                 try:
@@ -23,8 +21,17 @@ class FunctionalTest(StaticLiveServerTestCase):
                     if time.time() - start_time > limit_time:
                         raise e
                     time.sleep(tick_time)
+        return wrapper
+    return decorator
 
-        return inner_wrapper
+
+class FunctionalTest(StaticLiveServerTestCase):
+    @staticmethod
+    def wait_for(callback: callable) -> Callable:
+        @wait()
+        def wrapper(*args, **kwargs) -> None:
+            callback(*args, **kwargs)
+        return wrapper
 
     def wait_to_be_logged_in(self, email: str) -> None:
         self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'Log out'))()
