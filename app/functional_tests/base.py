@@ -1,6 +1,7 @@
 from typing import Callable
 import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.common import WebDriverException
 from selenium import webdriver
@@ -42,6 +43,18 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.wait_for(lambda: self._browser.find_element(By.NAME, 'email'))()
         navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
         self.assertNotIn(email, navbar.text)
+
+    def enter_and_submit_list_item(
+            self,
+            item_text: str,
+            check_creating: bool = True
+    ) -> None:
+        current_item_count = len(self._browser.find_elements(By.CSS_SELECTOR, '#id_list_table tr'))
+        input_box = self.get_item_input_box()
+        input_box.send_keys(item_text)
+        input_box.send_keys(Keys.ENTER)
+        if check_creating:
+            self.wait_for(self.check_row_in_list_table)(f'{current_item_count + 1}: {item_text}')
 
     def check_row_in_list_table(self, row_text: str) -> None:
         table = self._browser.find_element(By.ID, 'id_list_table')

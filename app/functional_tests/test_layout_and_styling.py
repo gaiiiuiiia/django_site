@@ -21,9 +21,7 @@ class TestLayoutAndStying(FunctionalTest):
         )
 
         # Она начинает новый список и видит, что там поле для ввода также центрировано
-        input_box.send_keys('New list')
-        input_box.send_keys(Keys.ENTER)
-        self.wait_for(self.check_row_in_list_table)('1: New list')
+        self.enter_and_submit_list_item('new list item')
 
         input_box = self.get_item_input_box()
         self.assertAlmostEqual(
