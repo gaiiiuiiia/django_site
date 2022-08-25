@@ -39,3 +39,7 @@ def new_list(request: HttpRequest) -> HttpResponse:
     return render(request, 'lists/home.html', {
         'form': form,
     })
+
+
+def user_list(request: HttpRequest, email: str) -> HttpResponse:
+    return render(request, 'lists/user_list.html')

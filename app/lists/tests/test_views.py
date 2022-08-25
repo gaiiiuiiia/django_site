@@ -1,5 +1,3 @@
-from unittest import skip
-
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
@@ -200,3 +198,11 @@ class NewListTest(TestCase):
 
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
+
+
+class TestUserList(TestCase):
+    def test_user_list_url_renders_user_list_template(self) -> None:
+        response = self.client.get(reverse(
+            'lists.user_list', kwargs={'email': 'mail@me.com'}
+        ))
+        self.assertTemplateUsed(response, 'lists/user_list.html')
