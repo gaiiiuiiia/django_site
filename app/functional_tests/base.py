@@ -34,11 +34,13 @@ class FunctionalTest(StaticLiveServerTestCase):
             callback(*args, **kwargs)
         return wrapper
 
+    @wait()
     def wait_to_be_logged_in(self, email: str) -> None:
         self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'Log out'))()
         navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
         self.assertIn(email, navbar.text)
 
+    @wait()
     def wait_to_be_logged_out(self, email: str) -> None:
         self.wait_for(lambda: self._browser.find_element(By.NAME, 'email'))()
         navbar = self._browser.find_element(By.CSS_SELECTOR, '.navbar')
