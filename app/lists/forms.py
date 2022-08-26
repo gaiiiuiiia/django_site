@@ -24,7 +24,7 @@ class ItemForm(forms.ModelForm):
             },
         }
 
-    def save_for_list(self, list_: List) -> None:
+    def save_for_list(self, list_: List) -> Item:
         self.instance.list = list_
         return super().save()
 

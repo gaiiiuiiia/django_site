@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpRequest
 
+from accounts.models import User
 from lists.forms import ItemForm, ExistingListItemForm
 from lists.models import Item, List
 
@@ -32,8 +33,10 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
 def new_list(request: HttpRequest) -> HttpResponse:
     form = ItemForm(data=request.POST)
     if form.is_valid():
-        list_ = List.objects.create()
-        Item.objects.create(text=form.cleaned_data.get('text'), list=list_)
+        list_ = List()
+        list_.owner = request.user
+        list_.save()
+        form.save_for_list(list_)
         return redirect(list_)
 
     return render(request, 'lists/home.html', {
@@ -42,4 +45,6 @@ def new_list(request: HttpRequest) -> HttpResponse:
 
 
 def user_list(request: HttpRequest, email: str) -> HttpResponse:
-    return render(request, 'lists/user_list.html')
+    return render(request, 'lists/user_list.html', {
+        'owner': User.objects.get(email=email)
+    })

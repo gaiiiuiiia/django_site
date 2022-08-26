@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
+from accounts.models import User
 from lists.forms import (
     ItemForm, ExistingListItemForm,
     EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR,
@@ -199,10 +200,27 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
+    def test_list_owner_is_saved_if_user_is_authenticated(self) -> None:
+        user = User.objects.create(email='mail@me.com')
+        # тестовый пользователь теперь зарегистрирован
+        self.client.force_login(user)
+        self.client.post(reverse('lists.new'), data={'text': 'some text'})
+        list_ = List.objects.first()
+        self.assertEqual(list_.owner, user.email)
+
 
 class TestUserList(TestCase):
     def test_user_list_url_renders_user_list_template(self) -> None:
+        user = User.objects.create(email='mail@me.com')
         response = self.client.get(reverse(
-            'lists.user_list', kwargs={'email': 'mail@me.com'}
+            'lists.user_list', kwargs={'email': user.email}
         ))
         self.assertTemplateUsed(response, 'lists/user_list.html')
+
+    def test_passing_correct_owner_to_template(self) -> None:
+        User.objects.create(email='wrong@email.com')
+        correct_user = User.objects.create(email='correct@email.com')
+        response = self.client.get(reverse(
+            'lists.user_list', kwargs={'email': correct_user.email}
+        ))
+        self.assertEqual(response.context['owner'], correct_user)
