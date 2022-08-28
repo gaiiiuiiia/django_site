@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
+from accounts.models import User
 from lists.models import Item
 from lists.models import List
 
@@ -13,6 +14,15 @@ class ListModelTest(TestCase):
             list_.get_absolute_url(),
             reverse('lists.view', kwargs={'list_id': list_.id})
         )
+
+    def test_lists_can_have_owners(self) -> None:
+        user = User.objects.create(email='some@mail.me')
+        list_ = List.objects.create(owner=user)
+        self.assertIn(list_, user.list_set.all())
+
+    def test_owner_is_optional(self) -> None:
+        # Это не должно вызвать исключение
+        List.objects.create()
 
 
 class ItemModelTest(TestCase):

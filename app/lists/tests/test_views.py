@@ -206,7 +206,7 @@ class NewListTest(TestCase):
         self.client.force_login(user)
         self.client.post(reverse('lists.new'), data={'text': 'some text'})
         list_ = List.objects.first()
-        self.assertEqual(list_.owner, user.email)
+        self.assertEqual(list_.owner.email, user.email)
 
 
 class TestUserList(TestCase):
