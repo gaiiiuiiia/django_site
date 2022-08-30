@@ -15,5 +15,9 @@ class Item(models.Model):
 class List(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, blank=True, null=True)
 
+    @property
+    def name(self) -> str:
+        return self.item_set.first().text
+
     def get_absolute_url(self) -> str:
         return reverse('lists.view', kwargs={'list_id': self.id})

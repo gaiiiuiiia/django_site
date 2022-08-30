@@ -24,6 +24,12 @@ class ListModelTest(TestCase):
         # Это не должно вызвать исключение
         List.objects.create()
 
+    def test_list_name_is_first_item_text(self) -> None:
+        list_ = List.objects.create()
+        first_item = Item.objects.create(list=list_, text='first')
+        Item.objects.create(list=list_, text='second')
+        self.assertEqual(list_.name, first_item.text)
+
 
 class ItemModelTest(TestCase):
     def test_item_default_text(self) -> None:
