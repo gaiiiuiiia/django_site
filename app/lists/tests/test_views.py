@@ -1,3 +1,8 @@
+import unittest
+from unittest import skip
+from unittest.mock import patch, Mock
+
+from django.http import HttpRequest
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
@@ -9,6 +14,7 @@ from lists.forms import (
 )
 from lists.models import Item
 from lists.models import List
+from lists.views import new_list, new_list2
 
 
 class HomePageTest(TestCase):
@@ -133,7 +139,7 @@ class ListViewTest(TestCase):
         self.assertEqual(Item.objects.all().count(), 1)
 
 
-class NewListTest(TestCase):
+class NewListViewIntegratedTest(TestCase):
     def test_can_save_a_POST_request(self) -> None:
         self.client.post(
             reverse('lists.new'),
@@ -200,14 +206,50 @@ class NewListTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
-    def test_list_owner_is_saved_if_user_is_authenticated(self) -> None:
-        user = User.objects.create(email='mail@me.com')
-        # тестовый пользователь теперь зарегистрирован
-        self.client.force_login(user)
-        self.client.post(reverse('lists.new'), data={'text': 'some text'})
-        list_ = List.objects.first()
-        self.assertEqual(list_.owner, user.email)
+    @skip
+    @patch('lists.views.redirect')
+    @patch('lists.views.List')
+    @patch('lists.views.ItemForm')
+    def test_list_owner_is_saved_if_user_is_authenticated(
+            self,
+            mock_item_form_class,
+            mock_list_class,
+            mock_redirect,
+    ) -> None:
+        request = HttpRequest()
+        request.POST['text'] = 'some text'
+        request.user = Mock()
 
+        mock_list = mock_list_class.return_value
+        # проверим, что установка пользователя произошла до сохранения объекта списка
+        mock_list.save.side_effect = lambda: self.assertEqual(mock_list.owner, request.user)
+        new_list(request)
+
+        self.assertEqual(mock_list.owner, request.user)
+        mock_list.save.assert_called_once_with()
+
+
+@patch('lists.views.NewListForm')
+class NewListViewUnitTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.request = HttpRequest()
+        self.request.POST['text'] = 'some text'
+        self.request.user = Mock()
+
+    def test_passes_POST_data_to_NewListForm(self, mock_new_list_form) -> None:
+        new_list2(self.request)
+        mock_new_list_form.assert_called_once_with(data=self.request.POST)
+
+    def test_saves_form_with_owner_is_form_is_valid(self, mock_new_list_form) -> None:
+        mock_form = mock_new_list_form.return_value
+        mock_form.is_valid.return_value = True
+        new_list2(self.request)
+        mock_form.save.assert_called_once_with(owner=self.request.user)
+
+    def test_redirects_to_form_returned_object_if_form_is_valid(self) -> None:
+        # TODO доделать
+        pass
+        
 
 class TestUserList(TestCase):
     def test_user_list_url_renders_user_list_template(self) -> None:
