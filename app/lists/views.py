@@ -31,22 +31,13 @@ def view_list(request: HttpRequest, list_id: int) -> HttpResponse:
 
 
 def new_list(request: HttpRequest) -> HttpResponse:
-    form = ItemForm(data=request.POST)
+    form = NewListForm(data=request.POST)
     if form.is_valid():
-        list_ = List()
-        list_.owner = request.user
-        list_.save()
-        form.save_for_list(list_)
+        list_ = form.save_with_owner(owner=request.user)
         return redirect(list_)
-
     return render(request, 'lists/home.html', {
         'form': form,
     })
-
-
-def new_list2(request: HttpRequest) -> HttpResponse:
-    form = NewListForm(data=request.POST)
-    form.save(owner=request.user)
 
 
 def user_list(request: HttpRequest, email: str) -> HttpResponse:

@@ -1,6 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from accounts.models import User
 from lists.models import Item, List
 
 EMPTY_ITEM_ERROR = 'You can`t have empty list item'
@@ -42,5 +43,8 @@ class ExistingListItemForm(ItemForm):
             self._update_errors(e)
 
 
-class NewListForm:
-    pass
+class NewListForm(ItemForm):
+    def save_with_owner(self, owner: User) -> List:
+        if owner.is_authenticated:
+            return List.create_new(first_item_text=self.cleaned_data.get('text'), owner=owner)
+        return List.create_new(first_item_text=self.cleaned_data.get('text'))

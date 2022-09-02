@@ -1,5 +1,4 @@
 import unittest
-from unittest import skip
 from unittest.mock import patch, Mock
 
 from django.http import HttpRequest
@@ -14,7 +13,7 @@ from lists.forms import (
 )
 from lists.models import Item
 from lists.models import List
-from lists.views import new_list, new_list2
+from lists.views import new_list
 
 
 class HomePageTest(TestCase):
@@ -206,7 +205,6 @@ class NewListViewIntegratedTest(TestCase):
         self.assertEqual(List.objects.count(), 0)
         self.assertEqual(Item.objects.count(), 0)
 
-    @skip
     @patch('lists.views.redirect')
     @patch('lists.views.List')
     @patch('lists.views.ItemForm')
@@ -236,20 +234,43 @@ class NewListViewUnitTest(unittest.TestCase):
         self.request.POST['text'] = 'some text'
         self.request.user = Mock()
 
+    def get_mock_form(self, mock_new_list_form) -> unittest.mock.Mock:
+        mock_form = mock_new_list_form.return_value
+        # because redirect(obj) raises TypeError if obj is mock
+        mock_form.save_with_owner.return_value.get_absolute_url.return_value = 'fakeurl'
+        return mock_form
+
     def test_passes_POST_data_to_NewListForm(self, mock_new_list_form) -> None:
-        new_list2(self.request)
+        self.get_mock_form(mock_new_list_form)
+        new_list(self.request)
         mock_new_list_form.assert_called_once_with(data=self.request.POST)
 
     def test_saves_form_with_owner_is_form_is_valid(self, mock_new_list_form) -> None:
-        mock_form = mock_new_list_form.return_value
+        mock_form = self.get_mock_form(mock_new_list_form)
         mock_form.is_valid.return_value = True
-        new_list2(self.request)
-        mock_form.save.assert_called_once_with(owner=self.request.user)
+        new_list(self.request)
+        mock_form.save_with_owner.assert_called_once_with(owner=self.request.user)
 
-    def test_redirects_to_form_returned_object_if_form_is_valid(self) -> None:
-        # TODO доделать
-        pass
-        
+    @patch('lists.views.redirect')
+    def test_redirects_to_form_returned_object_if_form_is_valid(self, mock_redirect, mock_new_list_form) -> None:
+        mock_form = self.get_mock_form(mock_new_list_form)
+        mock_form.is_valid.return_value = True
+
+        response = new_list(self.request)
+
+        self.assertEqual(response, mock_redirect.return_value)
+        mock_redirect.assert_called_once_with(mock_form.save_with_owner.return_value)
+
+    @patch('lists.views.render')
+    def test_renders_home_template_if_from_is_not_valid(self, mock_render, mock_new_list_form) -> None:
+        mock_form = self.get_mock_form(mock_new_list_form)
+        mock_form.is_valid.return_value = False
+
+        response = new_list(self.request)
+
+        self.assertEqual(response, mock_render.return_value)
+        mock_render.assert_called_once_with(self.request, 'lists/home.html', {'form': mock_form})
+
 
 class TestUserList(TestCase):
     def test_user_list_url_renders_user_list_template(self) -> None:

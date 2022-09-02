@@ -1,7 +1,7 @@
 from typing import Callable
 import time
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, FirefoxOptions
 from selenium.webdriver.common.by import By
 from selenium.common import WebDriverException
 from selenium import webdriver
@@ -67,7 +67,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         return self._browser.find_element(By.ID, 'id_text')
 
     def setUp(self) -> None:
-        self._browser = webdriver.Firefox()
+        options = FirefoxOptions()
+        options.add_argument('--headless')
+        self._browser = webdriver.Firefox(options=options)
 
     def tearDown(self) -> None:
         self._browser.quit()

@@ -8,7 +8,7 @@ from .base import FunctionalTest
 User = get_user_model()
 
 
-class TestMyList(FunctionalTest):
+class TestUserList(FunctionalTest):
     def create_pre_authenticated_session(self, email: str) -> None:
         user = User.objects.create(email=email)
         session = SessionStore()
@@ -51,9 +51,9 @@ class TestMyList(FunctionalTest):
         # Она с непреодолимым интересом кликает на эту кнопку и видит,
         # что на этой странице отображен ее список с названием в честь первого элемента ее списка
         btn_my_lists.click()
-        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'solaris'))
+        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'solaris'))()
         self._browser.find_element(By.LINK_TEXT, 'solaris').click()
-        self.wait_for(lambda: self.assertEqual(self._browser.current_url, first_lists_url))
+        self.wait_for(lambda: self.assertEqual(self._browser.current_url, first_lists_url))()
 
         # Она возвращается на главную
         self._browser.get(self.live_server_url)
@@ -67,12 +67,12 @@ class TestMyList(FunctionalTest):
         self._browser.find_element(By.ID, 'id_my_lists').click()
 
         # И уже ее встречают два ее списка
-        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'solaris'))
-        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'new horizon'))
+        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'solaris'))()
+        self.wait_for(lambda: self._browser.find_element(By.LINK_TEXT, 'new horizon'))()
 
         self._browser.find_element(By.LINK_TEXT, 'new horizon').click()
 
-        self.wait_for(lambda: self.assertEqual(self._browser.current_url, second_list_url))
+        self.wait_for(lambda: self.assertEqual(self._browser.current_url, second_list_url))()
 
         # Она выходит из системы и больше не видит кнопку "Мои списки"
         self._browser.find_element(By.CLASS_NAME, 'btn-logout').click()
@@ -80,6 +80,6 @@ class TestMyList(FunctionalTest):
         self.wait_for(lambda: self.assertEqual(
             self._browser.find_elements(By.ID, 'id_my_lists'),
             []
-        ))
+        ))()
 
         self.fail('End Test')
